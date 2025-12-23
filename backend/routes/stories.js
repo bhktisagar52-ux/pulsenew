@@ -81,7 +81,8 @@ router.get('/user/:userId', authenticateToken, async (req, res) => {
 router.post('/', authenticateToken, upload.single('media'), async (req, res) => {
   try {
     const { mediaType, caption } = req.body;
-    const mediaUrl = req.file ? `http://localhost:5000/uploads/${req.file.filename}` : '';
+    const BASE_URL = req.app.get('BASE_URL');
+    const mediaUrl = req.file ? `${BASE_URL}/uploads/${req.file.filename}` : '';
     const story = new Story({
       author: req.user.id,
       mediaType,

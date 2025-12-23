@@ -164,7 +164,8 @@ router.post('/upload-profile-picture', upload.single('profilePicture'), async (r
 
     if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
 
-    user.profilePicture = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    const BASE_URL = req.app.get('BASE_URL');
+    user.profilePicture = `${BASE_URL}/uploads/${req.file.filename}`;
 
     await user.save();
 
