@@ -432,6 +432,35 @@ router.post('/:id/save', auth, async (req, res) => {
   }
 });
 
+// Delete a single post (only by the author)
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    // Check if the current user is the author of the post
+    if (post.author.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'You can only delete your own posts' });
+    }
+
+    // Delete all comments associated with this post
+    await Comment.deleteMany({ post: req.params.id });
+
+    // Delete all notifications related to this post
+    await Notification.deleteMany({ postId: req.params.id });
+
+    // Delete the post
+    await Post.findByIdAndDelete(req.params.id);
+
+    res.json({ message: 'Post deleted successfully' });
+  } catch (error) {
+    console.error('Delete post error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Delete all posts (temporary route for cleanup)
 router.delete('/all', auth, async (req, res) => {
   try {
