@@ -60,7 +60,8 @@ app.use(
 app.use(express.json());
 
 // Serve uploads folder
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+const uploadPath = process.env.UPLOAD_PATH || 'uploads';
+app.use('/uploads', express.static(path.join(__dirname, uploadPath)));
 
 // ======================
 // MongoDB

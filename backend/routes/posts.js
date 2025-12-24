@@ -9,7 +9,7 @@ const auth = require('../middleware/auth');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, process.env.UPLOAD_PATH || 'uploads/');
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + '-' + file.originalname);
@@ -238,7 +238,7 @@ router.post('/', auth, upload.single('media'), async (req, res) => {
   try {
     const { content, postType } = req.body;
 
-    const image = req.file ? `${req.app.get('BASE_URL')}/uploads/${req.file.filename}` : '';
+    const image = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : '';
 
     const post = new Post({
       author: req.user.id,
