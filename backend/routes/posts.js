@@ -432,4 +432,37 @@ router.post('/:id/save', auth, async (req, res) => {
   }
 });
 
+// Delete all posts (temporary route for cleanup)
+router.delete('/all', auth, async (req, res) => {
+  try {
+    // Only allow admin or specific user to delete all posts (you can modify this condition)
+    // For now, allowing any authenticated user - remove this in production
+    console.log('Deleting all posts...');
+
+    // Delete all posts
+    const deletedPosts = await Post.deleteMany({});
+    console.log(`Deleted ${deletedPosts.deletedCount} posts`);
+
+    // Delete all comments (since they're linked to posts)
+    const deletedComments = await Comment.deleteMany({});
+    console.log(`Deleted ${deletedComments.deletedCount} comments`);
+
+    // Delete post-related notifications
+    const deletedNotifications = await Notification.deleteMany({
+      type: { $in: ['like', 'comment'] }
+    });
+    console.log(`Deleted ${deletedNotifications.deletedCount} post-related notifications`);
+
+    res.json({
+      message: 'All posts, comments, and related notifications have been deleted successfully!',
+      deletedPosts: deletedPosts.deletedCount,
+      deletedComments: deletedComments.deletedCount,
+      deletedNotifications: deletedNotifications.deletedCount
+    });
+  } catch (error) {
+    console.error('Delete all posts error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;
