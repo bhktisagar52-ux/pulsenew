@@ -7,21 +7,35 @@ const Post = mongoose.model('Post');
 const Story = mongoose.model('Story');
 
 async function updateImages() {
-  await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/pulse_social');
+  await mongoose.connect(process.env.MONGODB_URI);
 
-  // Update posts
-  await Post.updateMany(
-    { image: { $regex: '^/uploads/' } },
-    [{ $set: { image: { $concat: ['http://localhost:5000', '$image'] } } }]
-  );
+  // Update posts - convert local paths to Cloudinary URLs
+  const posts = await Post.find({ image: { $regex: '^/uploads/' } });
+  console.log(`Found ${posts.length} posts with local image paths`);
 
-  // Update stories
-  await Story.updateMany(
-    { mediaUrl: { $regex: '^/uploads/' } },
-    [{ $set: { mediaUrl: { $concat: ['http://localhost:5000', '$mediaUrl'] } } }]
-  );
+  for (const post of posts) {
+    // Extract filename from local path
+    const filename = post.image.replace('/uploads/', '');
 
-  console.log('Images updated');
+    // Create Cloudinary URL
+    post.image = `https://res.cloudinary.com/pulse_social/image/upload/v1/pulse_social/${filename}`;
+    await post.save();
+  }
+
+  // Update stories - convert local paths to Cloudinary URLs
+  const stories = await Story.find({ mediaUrl: { $regex: '^/uploads/' } });
+  console.log(`Found ${stories.length} stories with local media paths`);
+
+  for (const story of stories) {
+    // Extract filename from local path
+    const filename = story.mediaUrl.replace('/uploads/', '');
+
+    // Create Cloudinary URL
+    story.mediaUrl = `https://res.cloudinary.com/pulse_social/image/upload/v1/pulse_social/${filename}`;
+    await story.save();
+  }
+
+  console.log(`Updated ${posts.length} posts and ${stories.length} stories to use Cloudinary URLs`);
   process.exit();
 }
 
