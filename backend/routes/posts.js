@@ -237,11 +237,8 @@ router.get('/:id', auth, async (req, res) => {
 router.post('/', auth, upload.single('media'), async (req, res) => {
   try {
     const { content, postType } = req.body;
-    const BASE_URL = req.app.get('BASE_URL');
 
-    const image = req.file
-      ? `${BASE_URL}/uploads/${req.file.filename}`
-      : '';
+    const image = req.file ? `${req.app.get('BASE_URL')}/uploads/${req.file.filename}` : '';
 
     const post = new Post({
       author: req.user.id,

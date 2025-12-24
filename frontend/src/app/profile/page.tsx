@@ -5,7 +5,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import api from '../../utils/api';
 import PostGridItem from '../../components/PostGridItem';
-import StoryHighlight from '../../components/StoryHighlight';
 import PostCard from '../../components/PostCard';
 
 interface Post {
@@ -19,24 +18,15 @@ interface Post {
   comments: any[];
 }
 
-interface Story {
-  _id: string;
-  mediaType: 'image' | 'video';
-  mediaUrl: string;
-  caption?: string;
-  createdAt: string;
-}
-
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
   const [posts, setPosts] = useState<Post[]>([]);
   const [reels, setReels] = useState<Post[]>([]);
-  const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'posts' | 'reels' | 'stories' | 'feed'>('posts');
-  const [stats, setStats] = useState({ posts: 0, reels: 0, stories: 0 });
+  const [activeTab, setActiveTab] = useState<'posts' | 'reels' | 'feed'>('feed');
+  const [stats, setStats] = useState({ posts: 0, reels: 0 });
 
   useEffect(() => {
     if (!authLoading) {
@@ -51,20 +41,17 @@ export default function ProfilePage() {
   const fetchProfileData = async () => {
     try {
       setLoading(true);
-      const [postsResponse, reelsResponse, storiesResponse] = await Promise.all([
+      const [postsResponse, reelsResponse] = await Promise.all([
         api.get('/api/posts', { params: { author: user!._id, postType: 'post' } }),
-        api.get('/api/posts', { params: { author: user!._id, postType: 'reel' } }),
-        api.get(`/api/stories/user/${user!._id}`)
+        api.get('/api/posts', { params: { author: user!._id, postType: 'reel' } })
       ]);
 
       setPosts(postsResponse.data);
       setReels(reelsResponse.data);
-      setStories(storiesResponse.data);
 
       setStats({
         posts: postsResponse.data.length,
-        reels: reelsResponse.data.length,
-        stories: storiesResponse.data.length
+        reels: reelsResponse.data.length
       });
     } catch (err: any) {
       console.error('Error fetching profile data:', err);
@@ -248,16 +235,9 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Stories Highlight */}
-        {stories.length > 0 && (
-          <div className="mx-4">
-            <StoryHighlight stories={stories} />
-          </div>
-        )}
-
         {/* Tabs */}
         <div className="glass-card mx-4 mb-4">
-        <div className="flex justify-center space-x-8 py-4">
+        <div className="flex flex-wrap justify-center gap-4 md:gap-8 py-4">
           <button
             onClick={() => setActiveTab('feed')}
             className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-semibold transition-all ${
@@ -290,17 +270,6 @@ export default function ProfilePage() {
           >
             <span>🎥</span>
             <span>Reels</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('stories')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-semibold transition-all ${
-              activeTab === 'stories'
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-400 hover:text-white hover:bg-gray-700'
-            }`}
-          >
-            <span>📖</span>
-            <span>Stories</span>
           </button>
         </div>
         </div>

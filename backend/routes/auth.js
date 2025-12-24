@@ -10,10 +10,10 @@ const { generateOTP, sendOTPEmail } = require('../utils/otp');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '..', 'uploads'));
+    cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+    cb(null, Date.now() + '-' + file.originalname);
   }
 });
 
@@ -164,6 +164,7 @@ router.post('/upload-profile-picture', upload.single('profilePicture'), async (r
 
     if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
 
+    // Store full URL for production compatibility
     const BASE_URL = req.app.get('BASE_URL');
     user.profilePicture = `${BASE_URL}/uploads/${req.file.filename}`;
 
