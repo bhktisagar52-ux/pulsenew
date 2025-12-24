@@ -2,18 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Story = require('../models/Story');
-const multer = require('multer');
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, process.env.UPLOAD_PATH || 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
-});
-
-const upload = multer({ storage });
+const { upload } = require('../config/cloudinary');
 
 // Middleware to verify JWT token
 const authenticateToken = (req, res, next) => {
@@ -81,8 +70,7 @@ router.get('/user/:userId', authenticateToken, async (req, res) => {
 router.post('/', authenticateToken, upload.single('media'), async (req, res) => {
   try {
     const { mediaType, caption } = req.body;
-    const BASE_URL = req.app.get('BASE_URL');
-    const mediaUrl = req.file ? `${BASE_URL}/uploads/${req.file.filename}` : '';
+    const mediaUrl = req.file ? req.file.path : '';
     const story = new Story({
       author: req.user.id,
       mediaType,

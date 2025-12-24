@@ -6,17 +6,7 @@ const Notification = require('../models/Notification');
 const User = require('../models/User');
 const multer = require('multer');
 const auth = require('../middleware/auth');
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, process.env.UPLOAD_PATH || 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
-});
-
-const upload = multer({ storage });
+const { upload } = require('../config/cloudinary');
 
 // Removed duplicate authenticateToken middleware - using imported auth middleware instead
 
@@ -238,7 +228,7 @@ router.post('/', auth, upload.single('media'), async (req, res) => {
   try {
     const { content, postType } = req.body;
 
-    const image = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : '';
+    const image = req.file ? req.file.path : '';
 
     const post = new Post({
       author: req.user.id,

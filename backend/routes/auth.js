@@ -7,17 +7,7 @@ const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const path = require('path');
 const { generateOTP, sendOTPEmail } = require('../utils/otp');
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, process.env.UPLOAD_PATH || 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
-});
-
-const upload = multer({ storage });
+const { upload } = require('../config/cloudinary');
 
 // Register
 router.post('/register', async (req, res) => {
@@ -164,8 +154,8 @@ router.post('/upload-profile-picture', upload.single('profilePicture'), async (r
 
     if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
 
-    // Store full URL for production compatibility
-    user.profilePicture = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    // Store Cloudinary URL
+    user.profilePicture = req.file.path;
 
     await user.save();
 
