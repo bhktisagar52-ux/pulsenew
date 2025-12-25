@@ -4,8 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../utils/api';
-
-
+import { normalizeImageUrl } from '../utils/imageUtils';
 
 interface User {
   _id: string;
@@ -38,9 +37,6 @@ interface PostCardProps {
   onLike: (postId: string) => void;
   onComment: (postId: string, content: string) => void;
 }
-
-/** ✅ Normalize media URL (handles localhost + production) */
-
 
 const PostCard: React.FC<PostCardProps> = ({
   post,
@@ -208,7 +204,7 @@ const PostCard: React.FC<PostCardProps> = ({
           {post.postType === 'reel' ? (
             !videoError ? (
               <video
-                src={post.image}
+                src={normalizeImageUrl(post.image)}
                 controls
                 playsInline
                 preload="metadata"
@@ -218,13 +214,13 @@ const PostCard: React.FC<PostCardProps> = ({
               />
             ) : (
               <img
-                src={post.image}
+                src={normalizeImageUrl(post.image)}
                 className="w-full max-h-[600px] rounded-lg object-cover"
               />
             )
           ) : (
             <img
-              src={post.image}
+              src={normalizeImageUrl(post.image)}
               className="w-full max-h-96 rounded-lg object-cover"
               loading="lazy"
             />

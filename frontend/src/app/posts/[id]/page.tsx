@@ -3,8 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import axios from 'axios';
+import { normalizeImageUrl } from '../../../utils/imageUtils';
 
-
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://pulsenew-l909.onrender.com';
 
 interface Post {
   _id: string;
@@ -74,14 +75,13 @@ const PostPage: React.FC = () => {
       </h1>
 
       {post.image && (
-  <img
-    src={post.image}
-    alt="Post"
-    className="w-full rounded-lg shadow-md mb-4"
-    loading="lazy"
-  />
-)}
-
+        <img
+          src={normalizeImageUrl(post.image)}
+          alt="Post"
+          className="w-full rounded-lg shadow-md mb-4"
+          loading="lazy"
+        />
+      )}
 
       <p className="mb-4">{post.content}</p>
 
