@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
+
 
 interface Post {
   _id: string;
@@ -74,17 +74,14 @@ const PostPage: React.FC = () => {
       </h1>
 
       {post.image && (
-        <img
-          src={
-            post.image.startsWith('http')
-              ? post.image.replace('http://localhost:5000', API_URL)
-              : `${API_URL}/uploads/${post.image}`
-          }
-          alt="Post"
-          className="w-full rounded-lg shadow-md mb-4"
-          loading="lazy"
-        />
-      )}
+  <img
+    src={post.image}
+    alt="Post"
+    className="w-full rounded-lg shadow-md mb-4"
+    loading="lazy"
+  />
+)}
+
 
       <p className="mb-4">{post.content}</p>
 

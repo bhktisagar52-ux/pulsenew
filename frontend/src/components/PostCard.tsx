@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../utils/api';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 
 interface User {
   _id: string;
@@ -40,12 +40,7 @@ interface PostCardProps {
 }
 
 /** ✅ Normalize media URL (handles localhost + production) */
-const getMediaUrl = (media?: string) => {
-  if (!media) return '';
-  return media.startsWith('http')
-    ? media.replace('http://localhost:5000', API_URL)
-    : `${API_URL}/uploads/${media}`;
-};
+
 
 const PostCard: React.FC<PostCardProps> = ({
   post,
@@ -213,7 +208,7 @@ const PostCard: React.FC<PostCardProps> = ({
           {post.postType === 'reel' ? (
             !videoError ? (
               <video
-                src={getMediaUrl(post.image)}
+                src={post.image}
                 controls
                 playsInline
                 preload="metadata"
@@ -223,13 +218,13 @@ const PostCard: React.FC<PostCardProps> = ({
               />
             ) : (
               <img
-                src={getMediaUrl(post.image)}
+                src={post.image}
                 className="w-full max-h-[600px] rounded-lg object-cover"
               />
             )
           ) : (
             <img
-              src={getMediaUrl(post.image)}
+              src={post.image}
               className="w-full max-h-96 rounded-lg object-cover"
               loading="lazy"
             />

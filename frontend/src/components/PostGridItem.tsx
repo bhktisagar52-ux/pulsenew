@@ -6,12 +6,6 @@ import { useRouter } from 'next/navigation';
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 /** ✅ Normalize media URL (handles localhost + production) */
-const getMediaUrl = (media?: string) => {
-  if (!media) return '';
-  return media.startsWith('http')
-    ? media.replace('http://localhost:5000', API_URL)
-    : `${API_URL}/uploads/${media}`;
-};
 
 interface Post {
   _id: string;
@@ -46,14 +40,14 @@ const PostGridItem: React.FC<PostGridItemProps> = ({ post }) => {
         {post.image ? (
           post.postType === 'reel' ? (
             <video
-              src={getMediaUrl(post.image)}
+              src={post.image}
               className="w-full h-full object-cover"
               muted
               preload="metadata"
             />
           ) : (
             <img
-              src={getMediaUrl(post.image)}
+              src={post.image}
               alt="Post"
               className="w-full h-full object-cover"
             />
