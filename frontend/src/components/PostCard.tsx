@@ -42,9 +42,12 @@ interface PostCardProps {
 /** ✅ Normalize media URL (handles localhost + production) */
 const getMediaUrl = (media?: string) => {
   if (!media) return '';
-  return media.startsWith('http')
-    ? media.replace('http://localhost:5000', API_URL)
-    : `${API_URL}/uploads/${media}`;
+  if (media.startsWith('http')) {
+    // Replace localhost with current protocol/host for dynamic handling
+    return media.replace('http://localhost:5000', `${window.location.protocol}//${window.location.host}`);
+  }
+  // For relative paths, use current protocol/host
+  return `${window.location.protocol}//${window.location.host}/uploads/${media}`;
 };
 
 const PostCard: React.FC<PostCardProps> = ({
